@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Janus Idol</title>
+  <style>
+    body {
+      background-color: #0b0b0d;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Start Button */
+    #start-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #f04b4b;
+      color: #0b0b0d;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+
+    /* Lyric Cards */
+    .lyric-card {
+      position: absolute;
+      background-color: #f04b4b;
+      border: 1px solid #790000;
+      color: #111115;
+      font-family: 'Impact', 'Arial Black', sans-serif;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 15px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+      animation: flash 0.25s ease-in-out;
+    }
+
+    /* Flash Effect katulad ng sa Tkinter */
+    @keyframes flash {
+      0% { 
+        background-color: #a10505; 
+        color: #ffffff; 
+        border: 3px solid #f04b4b; 
+      }
+      100% { 
+        background-color: #f04b4b; 
+        color: #111115; 
+        border: 1px solid #790000; 
+      }
+    }
+
+    /* Fade-out state ng mga lumang card */
+    .fade-out {
+      background-color: #0b0b0d !important;
+      color: #44444c !important;
+      border-color: #0b0b0d !important;
+    }
+
+    /* Final Scene Title */
+    #final-lyric {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Impact', 'Arial Black', sans-serif;
+      font-size: 2.8rem;
+      color: #ff0000;
+      text-align: center;
+      width: 90%;
+      z-index: 999;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <button id="start-btn">1 2 3 kanya kanya na</button>
+  <div id="final-lyric">IT'LL NEVER BE THE CURE</div>
+
+  <!-- Siguraduhing tugma ang filename ng audio file mo rito -->
+  <audio id="bg-audio" src="Cure.wav"></audio>
+
+  <script>
+    // Eksaktong kopya ng LYRICS_DATA at timestamps mo sa Python
+    const LYRICS_DATA = [
+  { start: 0.70, text: "OH, BECAUSE MY HEAD IS FULL OF POISON", x: 12, y: 15, w: 35, h: 30 },
+  { start: 4.10, text: "AND MY HEART IS FULL OF DOUBT", x: 52, y: 35, w: 32, h: 28 },
+  { start: 7.60, text: "I GOT TOXINS IN MY BLOODSTREAM", x: 8, y: 55, w: 35, h: 30 },
+  { start: 10.80, text: "YOU TRIED SO HARD TO SUCK OUT", x: 55, y: 8, w: 33, h: 28 },
+  { start: 14.40, text: "AND IT FEELS LIKE MEDICATION", x: 20, y: 38, w: 36, h: 30 },
+  { start: 17.40, text: "AND IT'S GOOD FOR ME, I'M SURE", x: 48, y: 58, w: 40, h: 25 },
+  { start: 20.70, text: "BUT IT DON'T MATTER HOW YOUR LOVE FEELS ANYMORE", x: 10, y: 10, w: 45, h: 32 }
+];
+
+const FINAL_LYRIC = { start: 25.80, text: "IT'LL NEVER BE THE CURE" };
+
+    const startBtn = document.getElementById('start-btn');
+    const audio = document.getElementById('bg-audio');
+    const finalLyric = document.getElementById('final-lyric');
+    
+    let lastCard = null;
+    let spawnedCards = [];
+
+    startBtn.addEventListener('click', () => {
+      startBtn.style.display = 'none';
+      audio.play();
+
+      // I-schedule ang bawat lyric card base sa exact timestamps
+      LYRICS_DATA.forEach(item => {
+        setTimeout(() => {
+          // I-fade out ang naunang card lang
+          if (lastCard) {
+            lastCard.classList.add('fade-out');
+          }
+
+          // Gumawa ng bagong card
+          const card = document.createElement('div');
+          card.className = 'lyric-card';
+          card.style.left = item.x + '%';
+          card.style.top = item.y + '%';
+          card.style.width = item.w + '%';
+          card.style.height = item.h + '%';
+          card.innerText = item.text;
+          
+          document.body.appendChild(card);
+          lastCard = card;
+          spawnedCards.push(card);
+
+        }, item.start * 1000);
+      });
+
+      // Grand Finale: Burahin ang cards at ipakita ang huling linya sa gitna
+      setTimeout(() => {
+        spawnedCards.forEach(c => c.remove());
+        finalLyric.style.display = 'block';
+      }, FINAL_LYRIC.start * 1000);
+
+    });
+  </script>
+</body>
+</html>
